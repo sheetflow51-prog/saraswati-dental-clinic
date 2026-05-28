@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://saraswati-dental-clinic.vercel.app/sitemap.xml
