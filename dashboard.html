@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Saraswati Dental Clinic — CRM Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --teal:#0A4F5C; --teal-dark:#073B45; --teal-light:#E6F0F1;
+  --gold:#C9A227; --gold-light:#F7EFD6;
+  --ink:#1A2B2E; --mute:#6B7B7D; --paper:#FFFFFF; --cream:#FAF8F5;
+  --green:#1E8E3E; --red:#C5221F; --blue:#174EA6; --orange:#B06000; --purple:#9334E6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--ink);line-height:1.5;padding:0 0 60px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+header{background:var(--teal);color:#fff;padding:26px 0 0}
+header .wrap{padding-bottom:20px}
+h1{font-family:'Playfair Display',Georgia,serif;font-size:30px;font-weight:800;letter-spacing:.3px}
+.sub{color:var(--gold-light);font-style:italic;font-size:14px;margin-top:6px}
+.gold-divider{height:4px;background:var(--gold)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:28px}
+.kpi{background:var(--paper);border-radius:18px;padding:22px 20px;box-shadow:0 6px 20px rgba(10,79,92,.08);border-top:4px solid var(--teal)}
+.kpi.gold{border-top-color:var(--gold)} .kpi.green{border-top-color:var(--green)} .kpi.red{border-top-color:var(--red)}
+.kpi .label{font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--mute);text-transform:uppercase}
+.kpi .num{font-family:'Playfair Display',serif;font-size:42px;font-weight:800;margin-top:8px;color:var(--teal)}
+.kpi.gold .num{color:var(--gold)} .kpi.green .num{color:var(--green)} .kpi.red .num{color:var(--red)}
+.section-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--teal);margin:36px 0 16px;display:flex;align-items:center;gap:10px}
+.section-title::after{content:"";flex:1;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.card{background:var(--paper);border-radius:18px;padding:22px;box-shadow:0 6px 20px rgba(10,79,92,.06)}
+.card h3{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:14px}
+canvas{max-height:260px}
+.kanban{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;overflow-x:auto}
+.col{background:var(--paper);border-radius:14px;padding:10px;min-width:150px;box-shadow:0 4px 14px rgba(10,79,92,.05)}
+.col-head{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-radius:9px;margin-bottom:10px;text-align:center}
+.col-head .count{opacity:.7;font-weight:600}
+.lead{background:var(--cream);border-radius:11px;padding:10px 11px;margin-bottom:9px;border-left:4px solid var(--teal);font-size:12.5px}
+.lead .name{font-weight:700;font-size:13px}
+.lead .meta{color:var(--mute);font-size:11.5px;margin-top:3px}
+.lead .svc{display:inline-block;margin-top:6px;font-size:10.5px;font-weight:600;background:var(--teal-light);color:var(--teal);padding:2px 8px;border-radius:20px}
+.s-new{background:#FFF6D6;color:#8A6D00} .s-contacted{background:#D6E4FF;color:#174EA6}
+.s-booked{background:#E6F4EA;color:#1E8E3E} .s-treated{background:#CDE7E9;color:#0A4F5C}
+.s-followup{background:#FFE8CC;color:#B06000} .s-closed{background:#F1F3F4;color:#5F6368}
+.b-new{border-left-color:#E0B400} .b-contacted{border-left-color:#174EA6}
+.b-booked{border-left-color:#1E8E3E} .b-treated{border-left-color:#0A4F5C}
+.b-followup{border-left-color:#B06000} .b-closed{border-left-color:#9aa0a6}
+.appt{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #eee}
+.appt:last-child{border-bottom:none}
+.appt .when{text-align:center;min-width:70px}
+.appt .when .d{font-weight:800;color:var(--teal);font-size:13px}
+.appt .when .t{font-size:11px;color:var(--mute)}
+.appt .who{flex:1}
+.appt .who .pn{font-weight:700;font-size:14px}
+.appt .who .ps{font-size:12px;color:var(--mute)}
+.pill{font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px}
+.p-confirmed{background:#E6F4EA;color:#1E8E3E} .p-cancelled{background:#FCE8E6;color:#C5221F} .p-completed{background:#F1F3F4;color:#5F6368}
+.links{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.qlink{background:var(--teal);color:#fff;text-decoration:none;padding:18px 20px;border-radius:14px;font-weight:600;display:flex;align-items:center;justify-content:space-between;transition:.2s;box-shadow:0 6px 18px rgba(10,79,92,.18)}
+.qlink:hover{background:var(--teal-dark);transform:translateY(-2px)}
+.qlink .arrow{font-size:18px}
+.foot{text-align:center;color:var(--mute);font-size:12px;margin-top:40px}
+@media(max-width:880px){
+  .kpis{grid-template-columns:1fr 1fr} .grid-2{grid-template-columns:1fr}
+  .kanban{grid-template-columns:repeat(6,minmax(150px,1fr))} .links{grid-template-columns:1fr}
+  h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>🦷 SARASWATI DENTAL CLINIC</h1>
+    <div class="sub">Lead Follow-up CRM · Dr. Ujjwal Singh, BDS, MIDA · Etmadpur, Agra</div>
+  </div>
+</header>
+<div class="gold-divider"></div>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="label">Total Leads</div><div class="num" id="k-total">0</div></div>
+    <div class="kpi gold"><div class="label">This Month</div><div class="num" id="k-month">0</div></div>
+    <div class="kpi green"><div class="label">Converted (Treated)</div><div class="num" id="k-conv">0</div></div>
+    <div class="kpi red"><div class="label">Pending Follow-up</div><div class="num" id="k-pend">0</div></div>
+  </div>
+
+  <div class="section-title">Analytics</div>
+  <div class="grid-2">
+    <div class="card"><h3>Lead Pipeline by Status</h3><canvas id="statusChart"></canvas></div>
+    <div class="card"><h3>Leads by Source</h3><canvas id="sourceChart"></canvas></div>
+  </div>
+
+  <div class="section-title">Pipeline</div>
+  <div class="kanban" id="kanban"></div>
+
+  <div class="section-title">Upcoming Appointments</div>
+  <div class="card" id="appts"></div>
+
+  <div class="section-title">Quick Links</div>
+  <div class="links">
+    <a class="qlink" href="https://airtable.com/appuxtTu2dcwAj6nE/tblp0COdRs6bAEJr6" target="_blank">📋 View All Leads <span class="arrow">→</span></a>
+    <a class="qlink" href="https://airtable.com/appuxtTu2dcwAj6nE/tbl58fuwSoXrflvDx" target="_blank">📅 Appointments <span class="arrow">→</span></a>
+    <a class="qlink" href="https://airtable.com/appuxtTu2dcwAj6nE/tblrrmJApVt5mfGwS" target="_blank">⚙️ Settings <span class="arrow">→</span></a>
+  </div>
+
+  <div class="foot">Saraswati Dental Clinic CRM · Static snapshot dashboard · Data lives in Airtable</div>
+</div>
+
+<script>
+const LEADS = [
+ {id:"SDC-001",name:"Priya Sharma",phone:"9012345678",service:"Smile Makeover",source:"Instagram",status:"Appointment Booked",added:"2026-05-20"},
+ {id:"SDC-002",name:"Rahul Verma",phone:"9898989898",service:"Root Canal",source:"Website",status:"Contacted",added:"2026-05-21"},
+ {id:"SDC-003",name:"Aisha Khan",phone:"9777712345",service:"Dental Implants",source:"Google",status:"New",added:"2026-05-22"},
+ {id:"SDC-004",name:"Vikram Singh",phone:"9555512345",service:"Orthodontics",source:"Referral",status:"Treated",added:"2026-05-23"},
+ {id:"SDC-005",name:"Neha Gupta",phone:"9333312345",service:"Scaling",source:"Walk-in",status:"Follow-up",added:"2026-05-24"},
+ {id:"SDC-006",name:"Arjun Mehta",phone:"9222212345",service:"Cosmetic Dentistry",source:"WhatsApp",status:"New",added:"2026-05-25"},
+ {id:"SDC-007",name:"Sunita Rao",phone:"9111112345",service:"General Checkup",source:"Website",status:"Closed",added:"2026-05-26"},
+ {id:"SDC-008",name:"Karan Malhotra",phone:"9444412345",service:"Dental Implants",source:"Google",status:"Appointment Booked",added:"2026-05-27"}
+];
+const APPTS = [
+ {name:"Priya Sharma",date:"2026-05-30",time:"11:00 AM",service:"Smile Makeover",status:"Confirmed"},
+ {name:"Karan Malhotra",date:"2026-05-30",time:"01:30 PM",service:"Dental Implants",status:"Confirmed"},
+ {name:"Rahul Verma",date:"2026-06-01",time:"10:30 AM",service:"Root Canal",status:"Confirmed"},
+ {name:"Neha Gupta",date:"2026-06-05",time:"12:00 PM",service:"Scaling",status:"Cancelled"},
+ {name:"Vikram Singh",date:"2026-05-24",time:"04:00 PM",service:"Orthodontics",status:"Completed"}
+];
+const STATUSES=["New","Contacted","Appointment Booked","Treated","Follow-up","Closed"];
+const SOURCES=["Website","WhatsApp","Walk-in","Referral","Instagram","Google"];
+const SKEY={"New":"new","Contacted":"contacted","Appointment Booked":"booked","Treated":"treated","Follow-up":"followup","Closed":"closed"};
+
+const now=new Date(), ym=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+document.getElementById("k-total").textContent=LEADS.length;
+document.getElementById("k-month").textContent=LEADS.filter(l=>l.added.startsWith(ym)).length;
+document.getElementById("k-conv").textContent=LEADS.filter(l=>l.status==="Treated").length;
+document.getElementById("k-pend").textContent=LEADS.filter(l=>!["Closed","Treated"].includes(l.status)).length;
+
+const statusCounts=STATUSES.map(s=>LEADS.filter(l=>l.status===s).length);
+const sourceCounts=SOURCES.map(s=>LEADS.filter(l=>l.source===s).length);
+new Chart(document.getElementById("statusChart"),{type:"bar",
+ data:{labels:STATUSES,datasets:[{data:statusCounts,backgroundColor:"#0A4F5C",borderRadius:6}]},
+ options:{plugins:{legend:{display:false}},scales:{y:{beginAtZero:true,ticks:{precision:0}}}}});
+new Chart(document.getElementById("sourceChart"),{type:"pie",
+ data:{labels:SOURCES,datasets:[{data:sourceCounts,backgroundColor:["#0A4F5C","#C9A227","#1E8E3E","#174EA6","#C5221F","#9334E6"]}]},
+ options:{plugins:{legend:{position:"right",labels:{boxWidth:12,font:{size:11}}}}}});
+
+const kb=document.getElementById("kanban");
+STATUSES.forEach(s=>{
+ const k=SKEY[s], list=LEADS.filter(l=>l.status===s);
+ const col=document.createElement("div"); col.className="col";
+ col.innerHTML=`<div class="col-head s-${k}">${s} <span class="count">${list.length}</span></div>`+
+  list.map(l=>`<div class="lead b-${k}"><div class="name">${l.name}</div>
+   <div class="meta">📞 ${l.phone} · ${l.source}</div>
+   <span class="svc">${l.service}</span></div>`).join("");
+ kb.appendChild(col);
+});
+
+const ap=document.getElementById("appts");
+const sorted=[...APPTS].sort((a,b)=>a.date.localeCompare(b.date));
+ap.innerHTML=sorted.map(a=>{
+ const d=new Date(a.date), ds=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short"});
+ const pk={"Confirmed":"confirmed","Cancelled":"cancelled","Completed":"completed"}[a.status];
+ return `<div class="appt"><div class="when"><div class="d">${ds}</div><div class="t">${a.time}</div></div>
+  <div class="who"><div class="pn">${a.name}</div><div class="ps">${a.service}</div></div>
+  <span class="pill p-${pk}">${a.status}</span></div>`;
+}).join("");
+</script>
+</body>
+</html>
